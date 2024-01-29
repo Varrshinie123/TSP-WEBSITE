@@ -21,7 +21,7 @@ app.post('/api/generate-upi-qr', (req, res) => {
         status: 'Pending',
     };
 
-    const upiQrData = `upi://pay?pa=8850912626@kotak&pn=8850912626@kotak&mc=0000&tid=${transactionId}&tr=${transactionId}&tn=PaymentDescription&am=${amount}&cu=INR&url=https://yourwebsite.com/payment-callback`;
+    const upiQrData = `upi://pay?pa=8850912626@kotak&pn=8850912626@kotak&tn=PaymentDescription&am=${amount}&cu=INR&url=https://yourwebsite.com/payment-callback`;
 
     res.json({ transactionId, upiQrData });
 });
