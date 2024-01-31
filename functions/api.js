@@ -74,5 +74,45 @@ app.get('/payment-status/:transactionId', async (req, res) => {
     }
 });
 
+// Add a new route for UPI payment callback
+app.post('/upi-payment-callback', async (req, res) => {
+    const { transactionId, status } = req.body;
+
+    try {
+        await client.connect(); // Connect to MongoDB
+        console.log('MongoDB connected');
+
+        const database = client.db("thestallionproject");
+        const collection = database.collection("payments");
+
+        // Find the document based on transactionId
+        const paymentDetails = await collection.findOne({ transactionId });
+
+        if (!paymentDetails) {
+            return res.status(404).json({ message: 'Transaction not found.' });
+        }
+
+        // Update the payment status based on the UPI payment status
+        if (status === 'success') {
+            await collection.updateOne(
+                { transactionId },
+                { $set: { status: 'Completed' } }
+            );
+
+            res.json({ message: 'Payment status updated to Completed.' });
+        } else {
+            // Handle other status if needed
+            res.json({ message: 'Payment status not updated.' });
+        }
+    } catch (error) {
+        console.error("Error updating payment status in MongoDB:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    } finally {
+        await client.close();
+    }
+});
+
+
+
 // Export a handler function for Netlify
 exports.handler = serverless(app);
